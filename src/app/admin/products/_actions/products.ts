@@ -38,7 +38,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
     Buffer.from(await data.image.arrayBuffer())
   );
 
-  db.product.create({
+  await db.product.create({
     data: {
       isAvailableForPurchase: false,
       name: data.name,
@@ -49,7 +49,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
     },
   });
 
-  console.log(formData);
+  //console.log(data);
 
   redirect("/admin/products");
 }
