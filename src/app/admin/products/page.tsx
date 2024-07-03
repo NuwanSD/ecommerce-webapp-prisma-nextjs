@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "../_components/page";
 import Link from "next/link";
@@ -20,6 +22,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import {
+  ActiveToggleDropdownItem,
+  DeleteDropdownItem,
+} from "./_components/ProductActions";
 
 export default function AdminProductsPage() {
   return (
@@ -89,7 +95,7 @@ async function ProductsTable() {
                   <MoreVertical />
                   <span className="sr-only">Actions</span>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className=" p-3 space-y-2">
                   <DropdownMenuItem>
                     <a download href={`/admin/products/${product.id}/download`}>
                       Download
@@ -100,6 +106,14 @@ async function ProductsTable() {
                       Edit
                     </Link>
                   </DropdownMenuItem>
+                  <ActiveToggleDropdownItem
+                    id={product.id}
+                    isAvailableForPurchase={product.isAvailableForPurchase}
+                  />
+                  <DeleteDropdownItem
+                    id={product.id}
+                    disabled={product._count.orders > 0}
+                  />
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
