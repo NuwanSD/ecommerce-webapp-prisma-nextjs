@@ -1,6 +1,7 @@
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { useTransition } from "react";
 import { deleteProduct, toggleProductAvailability } from "../_actions/products";
+import { useRouter } from "next/navigation";
 
 export async function ActiveToggleDropdownItem({
   id,
@@ -10,6 +11,7 @@ export async function ActiveToggleDropdownItem({
   isAvailableForPurchase: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   return (
     <DropdownMenuItem
@@ -17,6 +19,7 @@ export async function ActiveToggleDropdownItem({
       onClick={() => {
         startTransition(async () => {
           await toggleProductAvailability(id, !isAvailableForPurchase);
+          router.refresh();
         });
       }}
     >
