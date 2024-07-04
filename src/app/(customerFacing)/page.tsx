@@ -1,11 +1,13 @@
-import ProductCard from "@/components/ProductCard";
+import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import db from "@/db/db";
 import { Product } from "@prisma/client";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
-function getMostPopularProducts() {
+async function getMostPopularProducts() {
+  await wait(1000);
   return db.product.findMany({
     where: { isAvailableForPurchase: true },
     orderBy: { orders: { _count: "desc" } },
@@ -13,12 +15,17 @@ function getMostPopularProducts() {
   });
 }
 
-function getNewestProducts() {
+async function getNewestProducts() {
+  await wait(2000);
   return db.product.findMany({
     where: { isAvailableForPurchase: true },
     orderBy: { createdAt: "desc" },
     take: 6,
   });
+}
+
+function wait(duration: number) {
+  return new Promise((resolve) => setTimeout(resolve, duration));
 }
 
 export default function HomePage() {
@@ -38,7 +45,7 @@ type ProductGridSectionProps = {
   productsFetcher: () => Promise<Product[]>;
 };
 
-async function ProductGridSection({
+function ProductGridSection({
   productsFetcher,
   title,
 }: ProductGridSectionProps) {
@@ -54,10 +61,28 @@ async function ProductGridSection({
         </Button>
       </div>
       <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {(await productsFetcher()).map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
+        <Suspense
+          fallback={
+            <>
+              <ProductCardSkeleton />
+              <ProductCardSkeleton />
+              <ProductCardSkeleton />
+            </>
+          }
+        >
+          <ProductSuspense productsFetcher={productsFetcher} />
+        </Suspense>
       </div>
     </div>
   );
+}
+
+async function ProductSuspense({
+  productsFetcher,
+}: {
+  productsFetcher: () => Promise<Product[]>;
+}) {
+  return (await productsFetcher()).map((product) => (
+    <ProductCard key={product.id} {...product} />
+  ));
 }
